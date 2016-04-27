@@ -2,8 +2,6 @@ package com.rushabh.stocks;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -46,7 +44,8 @@ public class StockInformationActivity extends AppCompatActivity {
         ArrayList<Fragment> fragments=new ArrayList<>();
         StockDetailsFragment fragment=StockDetailsFragment.newInstance(stockNames);
         fragments.add(fragment);
-        fragments.add(new StockNewFragment());
+        StockNewsFragment stockNewsFragment=StockNewsFragment.newInstance(stockNames);
+        fragments.add(stockNewsFragment);
 //        fragments.add(new StockDetailsFragment());
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),fragments);

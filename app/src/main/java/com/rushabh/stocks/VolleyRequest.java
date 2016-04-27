@@ -2,6 +2,7 @@ package com.rushabh.stocks;
 
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -26,6 +28,7 @@ public class VolleyRequest {
 
     private VolleyResponseListener onVolleyResponse;
 
+    HashMap<String,String> params;
     public VolleyRequest(String url, final int requestId, final VolleyResponseListener listener) {
 
         makeRequest(url, requestId, listener);
@@ -44,6 +47,14 @@ public class VolleyRequest {
         makeRequest(url, requestId, listener);
 
     }
+
+    public VolleyRequest(String url,HashMap<String, String> headers, int requestId, VolleyResponseListener listener) {
+
+        this.params=headers;
+        makeRequest(url,requestId,listener);
+
+    }
+
 
     public String makeUrl(HashMap<String, String> params,String type) {
 
@@ -85,7 +96,28 @@ public class VolleyRequest {
                         if (onVolleyResponse != null)
                             onVolleyResponse.errorRecieved(error, requestId);
                     }
-                });
+                }
+        ){
+            /*@Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Log.d("beta","param");
+                if(VolleyRequest.this.params!=null){
+                    Log.d("beta","param "+VolleyRequest.this.params.toString());
+                    return  VolleyRequest.this.params;
+                }
+                return null;
+            }*/
+
+            /* @Override
+            public Map<String, String> getHeaders() {
+                Log.d("beta","param");
+                if(VolleyRequest.this.params!=null){
+                    Log.d("beta","param "+VolleyRequest.this.params.toString());
+                    return  VolleyRequest.this.params;
+                }
+                return super.getParams();
+            }*/
+        };
 
 
         request.setShouldCache(false);
