@@ -1,0 +1,116 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_marginBottom="20dp"
+    android:layout_height="match_parent">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="5dp"
+        tools:context=".StockDetailsFragment">
+
+        <!-- TODO: Update blank fragment layout -->
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_name"
+                style="@style/style_text_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="NAME" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_symbol"
+                style="@style/style_text_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="SYMBOL" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_last_price"
+                style="@style/style_text_edit"
+                android:hint="LAST PRICE" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_change"
+                style="@style/style_text_edit"
+                android:hint="CHANGE" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_timestamp"
+                style="@style/style_text_edit"
+                android:hint="TIMESTAMP" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_market_cap"
+                style="@style/style_text_edit"
+                android:hint="MARKETCAP" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_volume"
+                style="@style/style_text_edit"
+                android:hint="VOLUME" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_change_ytd"
+                style="@style/style_text_edit"
+                android:hint="CHANGE YTD" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+            <EditText
+                android:id="@+id/et_high"
+                style="@style/style_text_edit"
+                android:hint="HIGH" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+
+
+            <EditText
+                android:id="@+id/et_low"
+                style="@style/style_text_edit"
+                android:hint="LOW" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            style="@style/style_textinput">
+            <EditText
+                android:id="@+id/et_open"
+                style="@style/style_text_edit"
+                android:hint="OPEN" />
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/iv_stock_image"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="10dp"
+            android:paddingBottom="80dp"
+            android:layout_height="300dp" />
+
+    </LinearLayout>
+
+</ScrollView>
