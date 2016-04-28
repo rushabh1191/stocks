@@ -1,9 +1,8 @@
 package com.rushabh.stocks;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +12,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.rushabh.stocks.modelclasses.StockNames;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,6 +35,8 @@ public class StockNewsFragment extends Fragment implements VolleyResponseListene
 
     @Bind(R.id.lv_news)
     ListView listView;
+    ArrayList<NewsModel> newsModelArrayList=new ArrayList<>();
+    NewsAdapter adapter;
 
 
     public StockNewsFragment() {
@@ -51,72 +53,81 @@ public class StockNewsFragment extends Fragment implements VolleyResponseListene
         return fragment;
     }
 
-    public void fetchNews(){
+    public void fetchNews() {
 
-        HashMap<String,String> params=new HashMap<>();
+        HashMap<String, String> params = new HashMap<>();
 
-        String auth="90ljRCLuqXJ1kNWYVeytAaJC3FKLjr54pTtfbg+iILM";
-        JSONObject jsonObject=new JSONObject();
-        try {
-            jsonObject.putOpt("user",auth);
-            jsonObject.putOpt("password",auth);
-            params.put("Authorization",jsonObject.toString());
+        String url = "https://api.datamarket.azure.com/Bing/Search/v1/News?Query=%27" +
+                stockNames.symbol + "%27&$format=json";
 
-            String url="https://api.datamarket.azure.com/Bing/Search/v1/News?Query=%27"+
-                    stockNames.symbol+"%27&$format=json";
-            new VolleyRequest(url,params,1,this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        new VolleyRequest(url, params, 1, this);
+
 
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle=getArguments();
+        Bundle bundle = getArguments();
 
-        stockNames= (StockNames) bundle.getSerializable(ARG_PARAM1);
+        stockNames = (StockNames) bundle.getSerializable(ARG_PARAM1);
+
 
         fetchNews();
-
-        /*if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_stock_new, container, false);
-        ButterKnife.bind(this,view);
-        return  view;
+        View view = inflater.inflate(R.layout.fragment_stock_new, container, false);
+        ButterKnife.bind(this, view);
+
+        adapter=new NewsAdapter(newsModelArrayList,inflater);
+
+        listView.setAdapter(adapter);
+        return view;
     }
 
 
     @Override
-    public void responseRecieved(String jsonObject, int requestId) {
+    public void responseRecieved(String response, int requestId) {
 
-        Log.d("beta respnse",jsonObject);
+//        Log.d("beta respnse", jsonObject);
+
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+
+            JSONArray news=jsonObject.getJSONObject("d").getJSONArray("results");
+
+            Gson gson=new Gson();
+            for(int i=0;i<news.length();i++){
+                NewsModel newsModel=gson.fromJson(news.getString(i),NewsModel.class);
+                newsModelArrayList.add(newsModel);
+            }
+
+            adapter.notifyDataSetChanged();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void errorRecieved(VolleyError error, int requestId) {
-        Log.d("beta errep",error.toString());
     }
 }
 
-class NewsAdapter extends BaseAdapter{
+class NewsAdapter extends BaseAdapter {
 
     ArrayList<NewsModel> newsList;
     LayoutInflater inflater;
 
-    public NewsAdapter(ArrayList<NewsModel> list, LayoutInflater inflater){
-        this.inflater=inflater;
-        this.newsList=list;
+    public NewsAdapter(ArrayList<NewsModel> list, LayoutInflater inflater) {
+        this.inflater = inflater;
+        this.newsList = list;
     }
+
     @Override
     public int getCount() {
         return newsList.size();
@@ -135,39 +146,52 @@ class NewsAdapter extends BaseAdapter{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         NewsViewHolder holder;
-        if(convertView==null){
+        if (convertView == null) {
 
-            convertView=inflater.inflate(R.layout.item_news,parent,false);
-            holder=new NewsViewHolder(convertView);
+            convertView = inflater.inflate(R.layout.item_news, parent, false);
+            holder = new NewsViewHolder(convertView);
 
             convertView.setTag(holder);
-        }
-        else{
+        } else {
 
-            holder= (NewsViewHolder) convertView.getTag();
+            holder = (NewsViewHolder) convertView.getTag();
         }
 
-        NewsModel model=getItem(position);
-        holder.tvNewsTitle.setText(model.newsTitle);
+        NewsModel model = getItem(position);
+        holder.tvNewsTitle.setText(Html.fromHtml("<u>"+model.newsTitle+"</u>"));
+
+        Log.d("beta","d"+model.desciption);
+        holder.tvNewsDesciprtion.setText(model.desciption);
+        holder.tvSource.setText("Publisher : "+model.source);
+        holder.tvDate.setText("Date : "+model.date);
+
         return convertView;
     }
 
-    class NewsViewHolder{
+    class NewsViewHolder {
 
         @Bind(R.id.tv_news_title)
         TextView tvNewsTitle;
 
-        NewsViewHolder(View view){
-            ButterKnife.bind(this,view);
+        @Bind(R.id.tv_news_description)
+        TextView tvNewsDesciprtion;
+
+        @Bind(R.id.tv_source)
+        TextView tvSource;
+        @Bind(R.id.tv_date)
+        TextView tvDate;
+
+        NewsViewHolder(View view) {
+            ButterKnife.bind(this, view);
         }
     }
 }
 
-class NewsModel{
+class NewsModel {
     @SerializedName("Title")
     String newsTitle;
 
-    @SerializedName("Descriptionn")
+    @SerializedName("Description")
     String desciption;
 
     @SerializedName("Source")

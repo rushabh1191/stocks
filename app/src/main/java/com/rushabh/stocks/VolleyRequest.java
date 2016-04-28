@@ -9,13 +9,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 
 public class VolleyRequest {
@@ -51,7 +47,10 @@ public class VolleyRequest {
     public VolleyRequest(String url,HashMap<String, String> headers, int requestId, VolleyResponseListener listener) {
 
         this.params=headers;
-        makeRequest(url,requestId,listener);
+        StockApp app = StockApp.getInstance();
+
+        StringRequest volleyRequest = createRequest(headers,url,1,listener);
+        app.addRequest(volleyRequest, requestId + "");
 
     }
 
@@ -72,8 +71,43 @@ public class VolleyRequest {
 
         onVolleyResponse = listener;
 
+        StringRequest request = new StringRequest(Request.Method.GET, finalUrl, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if (onVolleyResponse != null) {
 
-        Log.d("beta"," url "+finalUrl);
+                    Log.d("beta", response);
+                    onVolleyResponse.responseRecieved(response, requestId);
+
+
+                }
+            }
+        },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        error.printStackTrace();
+
+                        if (onVolleyResponse != null)
+                            onVolleyResponse.errorRecieved(error, requestId);
+                    }
+                }
+        );
+
+        request.setShouldCache(false);
+
+        int socketTimeout = 30000;
+        request.setRetryPolicy(new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        return request;
+    }
+
+    public StringRequest createRequest(final HashMap<String,String> headers, String finalUrl, final int requestId, final VolleyResponseListener listener) {
+
+        onVolleyResponse = listener;
+
         StringRequest request = new StringRequest(Request.Method.GET, finalUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -98,33 +132,30 @@ public class VolleyRequest {
                     }
                 }
         ){
-            /*@Override
+            @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Log.d("beta","param");
-                if(VolleyRequest.this.params!=null){
-                    Log.d("beta","param "+VolleyRequest.this.params.toString());
-                    return  VolleyRequest.this.params;
-                }
-                return null;
-            }*/
 
-            /* @Override
-            public Map<String, String> getHeaders() {
-                Log.d("beta","param");
-                if(VolleyRequest.this.params!=null){
-                    Log.d("beta","param "+VolleyRequest.this.params.toString());
-                    return  VolleyRequest.this.params;
-                }
-                return super.getParams();
-            }*/
+                HashMap<String,String> header= new HashMap<>();
+
+                String accountKeyEnc="OTBsalJDTHVxWEoxa05XWVZleXRBYUpDM0ZLTGpyNTRwVHRmYmcraUlMTTo5MGxqUkNMdXFYSjFrTldZVmV5dEFhSkMzRktManI1NHBUdGZiZytpSUxN";
+                Log.d("beta",accountKeyEnc);
+
+                String autValue=String.format("Basic %s", accountKeyEnc);
+                header.put("Authorization",autValue);
+
+                return  header;
+            }
+
+
         };
-
 
         request.setShouldCache(false);
 
         int socketTimeout = 30000;
         request.setRetryPolicy(new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
+        Log.d("beta","Request "+request.toString());
         return request;
     }
 }
+
