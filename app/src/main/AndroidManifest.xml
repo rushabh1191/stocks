@@ -21,7 +21,8 @@
         <activity
             android:name=".StockInformationActivity"
             android:label="@string/title_activity_stock_information"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

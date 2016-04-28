@@ -1,0 +1,22 @@
+
+
+/*@media screen and (min-width: 768px){
+   .rwd-break { display: none; }
+   
+}*/
+@media screen and (min-width: 768px){
+            .rwd-break { display: none; }
+        }
+
+th{
+    font-size: small;
+}
+.align-left{
+   float: left;
+ }
+.align-right{
+   float: right;
+ }
+.ui-helper-hidden-accessible { /*position: absolute; left: -9999px;*/
+    display: none;
+}

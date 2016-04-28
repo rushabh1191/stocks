@@ -2,20 +2,18 @@ package com.rushabh.stocks;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.TextView;
 
 import com.rushabh.stocks.modelclasses.StockNames;
@@ -42,8 +40,13 @@ public class StockInformationActivity extends AppCompatActivity {
         stockNames= (StockNames) getIntent().getExtras().get(STOCK_NAME);
 
         ArrayList<Fragment> fragments=new ArrayList<>();
+
         StockDetailsFragment fragment=StockDetailsFragment.newInstance(stockNames);
         fragments.add(fragment);
+
+        ChartFragment chartFragment=ChartFragment.getInstance(stockNames);
+        fragments.add(chartFragment);
+
         StockNewsFragment stockNewsFragment=StockNewsFragment.newInstance(stockNames);
         fragments.add(stockNewsFragment);
 //        fragments.add(new StockDetailsFragment());
@@ -79,9 +82,9 @@ public class StockInformationActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
