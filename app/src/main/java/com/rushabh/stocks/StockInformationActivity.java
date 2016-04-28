@@ -3,6 +3,7 @@ package com.rushabh.stocks;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -20,6 +21,9 @@ import com.rushabh.stocks.modelclasses.StockNames;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class StockInformationActivity extends AppCompatActivity {
 
 
@@ -28,16 +32,28 @@ public class StockInformationActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
 
+    @Bind(R.id.tabs)
+    TabLayout tabs;
+
     StockNames stockNames;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_information);
 
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+
+
         stockNames= (StockNames) getIntent().getExtras().get(STOCK_NAME);
+
+        setTitle(stockNames.name);
+
 
         ArrayList<Fragment> fragments=new ArrayList<>();
 
@@ -58,6 +74,8 @@ public class StockInformationActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         mViewPager.setOffscreenPageLimit(2);
+        tabs.setupWithViewPager(mViewPager);
+
     }
 
     public static Intent getIntent(StockNames stockNames, Context context){
@@ -81,6 +99,9 @@ public class StockInformationActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if(id == android.R.id.home){
+            onBackPressed();
+        }
         //noinspection SimplifiableIfStatement
         /*if (id == R.id.action_settings) {
             return true;
@@ -154,11 +175,11 @@ public class StockInformationActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "Current";
                 case 1:
-                    return "SECTION 2";
+                    return "Historical";
                 case 2:
-                    return "SECTION 3";
+                    return "News";
             }
             return null;
         }
