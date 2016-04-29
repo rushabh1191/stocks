@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
 
     ArrayList<StockDetailsModel> stockDetailList=new ArrayList<>();
 
+    PreferenceHelper preferenceHelper;
+
 
 
     @Override
@@ -91,7 +94,18 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
         pb.setVisibility(View.GONE);
         adapter=new StockNameListAdapter(listOfStocks,this);
 
+        handler=new Handler();
         etStockEntry.setAdapter(adapter);
+        preferenceHelper=new PreferenceHelper(this);
+
+        aSwitch.setChecked(preferenceHelper.isAutoRefresh());
+
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                preferenceHelper.saveAutoRefresh(isChecked  );
+            }
+        });
 
         favListAdapter=new FavListAdapter(stockDetailList,this);
         lvFavList.setAdapter(favListAdapter);
@@ -126,6 +140,14 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
             }
         });
     }
+
+    Runnable runnable=new Runnable() {
+        @Override
+        public void run() {
+
+            refreshList();
+        }
+    };
 
     @Override
     protected void onStart() {
@@ -180,6 +202,12 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
                     @Override
                     public void run() {
                         favListAdapter.notifyDataSetChanged();
+                        if(aSwitch.isChecked()){
+                            handler.removeCallbacks(runnable);
+                            handler.postDelayed(runnable,5000);
+                        }
+
+
                     }
                 });
             }

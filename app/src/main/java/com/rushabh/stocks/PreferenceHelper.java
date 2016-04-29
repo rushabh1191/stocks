@@ -2,6 +2,7 @@ package com.rushabh.stocks;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -13,7 +14,6 @@ public class PreferenceHelper {
 
 
     private SharedPreferences preference;
-
 
 
 
@@ -41,7 +41,8 @@ public class PreferenceHelper {
         Map<String, ?> map=preference.getAll();
         ArrayList<String> keys=new ArrayList<>();
         for (Map.Entry<String, ?> entry : map.entrySet()) {
-            keys.add(entry.getKey());
+            if(!entry.getKey().equals(AUTO_REFRESH))
+                keys.add(entry.getKey());
         }
         return keys;
     }
@@ -51,6 +52,16 @@ public class PreferenceHelper {
         preference.edit().putInt(key,value).apply();
     }
 
+    String AUTO_REFRESH="auto_Refresh";
+    public void saveAutoRefresh(boolean value)
+    {
+        preference.edit().putBoolean(AUTO_REFRESH,value).apply();
+    }
+
+    public boolean isAutoRefresh()
+    {
+        return preference.getBoolean(AUTO_REFRESH,true);
+    }
 
     public void removeKey(String symbol) {
         preference.edit().remove(symbol).apply();
