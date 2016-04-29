@@ -131,6 +131,17 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
             }
         });
 
+
+        lvFavList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                StockDetailsModel detailsModel=favListAdapter.getItem(position);
+
+                stockName=new StockNames(detailsModel);
+                getQuote(stockName);
+
+            }
+        });
         etStockEntry.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -243,6 +254,10 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
         stockName=null;
     }
 
+    void getQuote(StockNames stockNames){
+        Intent intent=StockInformationActivity.getIntent(stockName,this);
+        startActivity(intent);
+    }
     @OnClick(R.id.btn_get_quote)
     void getQuote(){
         if(etStockEntry.getText().toString().trim().length()==0){
@@ -250,8 +265,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
         }
        else{
             if(stockName!=null){
-                Intent intent=StockInformationActivity.getIntent(stockName,this);
-                startActivity(intent);
+               getQuote(stockName);
             }
             else{
                 new ConfirmationWindow(this,"Error","Please select stock from list","OK","'");

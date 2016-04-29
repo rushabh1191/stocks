@@ -16,6 +16,11 @@ public class StockNames implements Serializable{
     @SerializedName("Exchange")
     public String exchange;
 
+    public StockNames(StockDetailsModel detailsModel) {
+        name=detailsModel.name;
+        symbol=detailsModel.symbol;
+    }
+
     @Override
     public String toString() {
         return name;
