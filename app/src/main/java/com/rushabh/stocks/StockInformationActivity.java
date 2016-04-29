@@ -36,6 +36,11 @@ public class StockInformationActivity extends AppCompatActivity {
     TabLayout tabs;
 
     StockNames stockNames;
+
+    MenuItem favItem;
+
+    PreferenceHelper preferenceHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +50,7 @@ public class StockInformationActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        preferenceHelper=new PreferenceHelper(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
@@ -92,6 +98,18 @@ public class StockInformationActivity extends AppCompatActivity {
         return true;
     }
 
+    void showFavUnfav(boolean isFav){
+
+        int icon=isFav?R.drawable.ic_favorite_filled:R.drawable.ic_favorite_border;
+        favItem.setIcon(icon);
+    }
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        favItem=menu.findItem(R.id.id_fav);
+        showFavUnfav(preferenceHelper.isKeyPresent(stockNames.symbol));
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -101,6 +119,17 @@ public class StockInformationActivity extends AppCompatActivity {
 
         if(id == android.R.id.home){
             onBackPressed();
+        }
+        else if(id==R.id.id_fav){
+            boolean isKeyPresent=preferenceHelper.isKeyPresent(stockNames.symbol);
+            if(isKeyPresent){
+                preferenceHelper.removeKey(stockNames.symbol);
+            }
+            else{
+                preferenceHelper.saveInt(stockNames.symbol,1);
+            }
+            showFavUnfav(!isKeyPresent);
+
         }
         //noinspection SimplifiableIfStatement
         /*if (id == R.id.action_settings) {

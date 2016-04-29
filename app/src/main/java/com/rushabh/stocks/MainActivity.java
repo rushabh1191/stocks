@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,23 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.rushabh.stocks.helpers.ConfirmationWindow;
+import com.rushabh.stocks.helpers.Utils;
+import com.rushabh.stocks.modelclasses.StockDetailsModel;
 import com.rushabh.stocks.modelclasses.StockNames;
 
 import org.json.JSONArray;
@@ -29,6 +41,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -52,7 +68,20 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
 
     StockNameListAdapter adapter;
 
+    FavListAdapter favListAdapter;
+
+    @Bind(R.id.sw_switch)
+    Switch aSwitch;
+
+    @Bind(R.id.lvFav)
+    ListView lvFavList;
+
     StockNames stockName;
+
+    ArrayList<StockDetailsModel> stockDetailList=new ArrayList<>();
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +92,9 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
         adapter=new StockNameListAdapter(listOfStocks,this);
 
         etStockEntry.setAdapter(adapter);
+
+        favListAdapter=new FavListAdapter(stockDetailList,this);
+        lvFavList.setAdapter(favListAdapter);
 
         handler=new Handler();
 
@@ -94,6 +126,87 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        refreshList();
+    }
+
+    @OnClick(R.id.iv_refresh)
+    void refreshList(){
+
+
+        new Thread(){
+
+            @Override
+            public void run() {
+                super.run();
+                PreferenceHelper preferenceHelper=new PreferenceHelper(MainActivity.this);
+                ArrayList<String> keys=preferenceHelper.getAllKeys();
+
+                RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this, null);
+                Gson gson=new Gson();
+                stockDetailList.clear();
+                for(int i=0;i<keys.size();i++) {
+
+                    RequestFuture<String> future = RequestFuture.newFuture();
+                    Log.d("beta","Resquest"+keys.get(i));
+                    StringRequest request = createRequest(keys.get(i), future);
+                    Log.d("beta",request.getUrl());
+                    requestQueue.add(request);
+
+                    try {
+                        String response = future.get(30, TimeUnit.SECONDS);
+
+                        StockDetailsModel model=gson.fromJson(response,StockDetailsModel.class);
+
+                        stockDetailList.add(model);
+                        Log.d("beta","mo "+response);
+
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (TimeoutException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        favListAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }.start();
+
+
+    }
+
+    StringRequest createRequest(String stockNames,RequestFuture future){
+        StringRequest request = null;
+
+        Log.d("beta","stoc"+stockNames);
+
+        String url="http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=" + stockNames ;
+        request = new StringRequest(Request.Method.GET, url, future, future) {
+        };
+        request.setShouldCache(false);
+        int socketTimeout = 0;
+        request.setRetryPolicy(new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        return request;
+    }
+
+
+
+
+
 
 
     @OnClick(R.id.btn_clear)
@@ -228,3 +341,79 @@ class StockNameListAdapter extends ArrayAdapter<StockNames>{
 }
 
 
+class FavListAdapter extends BaseAdapter{
+
+    ArrayList<StockDetailsModel> detailsModelArrayList;
+
+    LayoutInflater inflater;
+    Context context;
+    FavListAdapter(ArrayList<StockDetailsModel> detailsModelArrayList,Context context){
+
+        this.context=context;
+        this.detailsModelArrayList=detailsModelArrayList;
+        inflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+    @Override
+    public int getCount() {
+        return detailsModelArrayList.size();
+    }
+
+    @Override
+    public StockDetailsModel getItem(int position) {
+        return detailsModelArrayList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        DetailViewHolder holder;
+        if(convertView==null){
+
+            convertView=inflater.inflate(R.layout.item_stock_fav_list,parent,false);
+            holder=new DetailViewHolder(convertView);
+            convertView.setTag(holder);
+        }
+        else{
+            holder= (DetailViewHolder) convertView.getTag();
+        }
+
+        StockDetailsModel model=getItem(position);
+        holder.tvStockName.setText(model.name);
+        holder.tvSymbol.setText(model.symbol);
+        holder.tvChange.setText(Utils.round(model.pecent)+" % ");
+        int color = model.pecent<0 ? android.R.color.holo_red_dark : android.R.color.holo_green_light;
+
+        holder.tvChange.setBackgroundColor(context.getResources().getColor(color));
+        holder.tvMarketCap.setText("Market Cap "+Utils.truncateNumber(model.marketcap));
+        holder.tvPrice.setText( "$ "+model.price);
+        return convertView;
+    }
+
+    class DetailViewHolder{
+
+        @Bind(R.id.tv_fav_stockname)
+        TextView tvStockName;
+
+        @Bind(R.id.tv_fav_market_cap)
+        TextView tvMarketCap;
+
+        @Bind(R.id.tv_fav_price)
+        TextView tvPrice;
+
+        @Bind(R.id.tv_fav_stocknsymbol)
+        TextView tvSymbol;
+
+        @Bind(R.id.tv_fav_change)
+        TextView tvChange;
+
+
+        public DetailViewHolder(View view){
+            ButterKnife.bind(this,view);
+        }
+    }
+}
