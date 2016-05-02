@@ -6,6 +6,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.FacebookSdk;
 
 /**
  * Created by rushabh on 26/04/16.
@@ -21,6 +22,7 @@ public class StockApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        FacebookSdk.sdkInitialize(getApplicationContext());
         mInstance=this;
     }
 

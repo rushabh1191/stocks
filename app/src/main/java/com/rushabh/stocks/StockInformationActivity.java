@@ -17,6 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.widget.ShareDialog;
 import com.rushabh.stocks.modelclasses.StockNames;
 
 import java.util.ArrayList;
@@ -91,6 +95,26 @@ public class StockInformationActivity extends AppCompatActivity {
     }
 
 
+    void shareOnFacebook(){
+        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "Stock Information")
+//                .putString("og:title", "Current Stock Price Of "+stockNames.name+" "+stockNames.)
+                .putString("og:description", "In the frozen wastes to the north of Winterfell, sinister and supernatural forces are mustering.")
+                .putString("books:isbn", "0-553-57340-3")
+                .build();
+
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("books.reads")
+                .putObject("book", object)
+                .build();
+
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("book")
+                .setAction(action)
+                .build();
+
+        ShareDialog.show(this, content);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

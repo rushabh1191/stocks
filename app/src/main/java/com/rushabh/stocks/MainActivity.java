@@ -30,6 +30,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.widget.ShareDialog;
 import com.google.gson.Gson;
 import com.rushabh.stocks.helpers.ConfirmationWindow;
 import com.rushabh.stocks.helpers.Utils;
@@ -260,6 +264,8 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
     }
     @OnClick(R.id.btn_get_quote)
     void getQuote(){
+
+
         if(etStockEntry.getText().toString().trim().length()==0){
             new ConfirmationWindow(this,"Error","Please enter stock name","OK","'");
         }
