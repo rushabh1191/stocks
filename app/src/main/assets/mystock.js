@@ -10,20 +10,49 @@ $(document).ready(function() {
 
     var stockData=Android.getStockData();
     var symbol=Android.getSymbol();
-    console.log("er1"+symbol);
-    $.fn.highstocktab(JSON.parse(stockData),symbol);
+    console.log("stock data"+stockData);
+    console.log("Calling stock");
+//   $.fn.getstockdetails();
+   $.fn.highstocktab(JSON.parse(stockData),symbol);
 
 
 });
 
 
 
+//Calls index.php which then calls interactive chart api of markit on demand (to avoid cross domain issue)
+$.fn.getstockdetails = function(){
+        $.ajax({
+                type: "GET",
+                url: "http://192.168.1.102/s1/index.php",
+                dataType: 'json', // what type of data do we expect back from the serve
+                success: function(data) {
+                    console.log(data);
+                    if(data.hasOwnProperty('Message')){
+                        $('#errormsg').show();
+                    }
+                    else
+                    {
+                        console.log("Data srecie");
+                        $.fn.highstocktab(data,"AAPL"); //Object + Symbol
+                    }
+                    
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+}
 
 
 
-$.fn.highstocktab = function(obj,symbol) {
 
 
+
+$.fn.highstocktab = function(obj,Symbol) {
+
+
+console.log("Object data "+typeof(obj));
        if (obj.Elements[0])
             Y_axis = obj.Elements[0].DataSeries.close.values;
         hist = [];
@@ -32,7 +61,6 @@ $.fn.highstocktab = function(obj,symbol) {
             var date = new Date(obj.Dates[i]);
             hist.push([Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()), Y_axis[i]]);
         }
-        console.log("hisstory length"+hist.length);
         if (hist.length > 0) {
             $('#history').highcharts('StockChart', {
                 rangeSelector: {
@@ -76,10 +104,10 @@ $.fn.highstocktab = function(obj,symbol) {
                     },min:0}]
 
                 , title: {
-                    text: symbol + ' Stock Value'
+                    text: Symbol + ' Stock Value'
                 }
                 , series: [{
-                    name: symbol.toUpperCase()
+                    name: Symbol.toUpperCase()
                     , data: hist
                     , type: 'area'
                     , threshold: null
@@ -103,13 +131,9 @@ $.fn.highstocktab = function(obj,symbol) {
                 }]
             });
         }
-/*Highcharts.setOptions({
-        chart: {
-                style: {
-                    width: '100px',
-                    height:'100px'
-        }
-    }
-});*/
+        console.log("Da")
+
+    
 
 };
+
