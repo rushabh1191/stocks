@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -22,7 +21,6 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -30,10 +28,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.facebook.share.model.ShareOpenGraphAction;
-import com.facebook.share.model.ShareOpenGraphContent;
-import com.facebook.share.model.ShareOpenGraphObject;
-import com.facebook.share.widget.ShareDialog;
 import com.google.gson.Gson;
 import com.rushabh.stocks.helpers.ConfirmationWindow;
 import com.rushabh.stocks.helpers.Utils;
@@ -42,11 +36,9 @@ import com.rushabh.stocks.modelclasses.StockNames;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -71,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
 
     ArrayList<StockNames> listOfStocks=new ArrayList<>();
 
-    StockNameListAdapter adapter;
+    StockNameListAdapter stockNameListAdapter;
 
     FavListAdapter favListAdapter;
 
@@ -96,10 +88,10 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
         ButterKnife.bind(this);
         etStockEntry.setThreshold(2);
         pb.setVisibility(View.GONE);
-        adapter=new StockNameListAdapter(listOfStocks,this);
+        stockNameListAdapter =new StockNameListAdapter(listOfStocks,this);
 
         handler=new Handler();
-        etStockEntry.setAdapter(adapter);
+        etStockEntry.setAdapter(stockNameListAdapter);
         preferenceHelper=new PreferenceHelper(this);
 
         aSwitch.setChecked(preferenceHelper.isAutoRefresh());
@@ -150,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position<listOfStocks.size()){
-                    stockName=adapter.getItem(position);
+                    stockName= stockNameListAdapter.getItem(position);
                 }
             }
         });
@@ -181,27 +173,25 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
                 super.run();
                 PreferenceHelper preferenceHelper=new PreferenceHelper(MainActivity.this);
                 ArrayList<String> keys=preferenceHelper.getAllKeys();
-
+                final ArrayList<StockDetailsModel> list=new ArrayList<StockDetailsModel>();
                 RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this, null);
                 Gson gson=new Gson();
-                stockDetailList.clear();
+
+
                 for(int i=0;i<keys.size();i++) {
 
                     RequestFuture<String> future = RequestFuture.newFuture();
-                    Log.d("beta","Resquest"+keys.get(i));
                     StringRequest request = createRequest(keys.get(i), future);
-                    Log.d("beta",request.getUrl());
                     requestQueue.add(request);
+
+
 
                     try {
                         String response = future.get(30, TimeUnit.SECONDS);
 
                         StockDetailsModel model=gson.fromJson(response,StockDetailsModel.class);
 
-                        stockDetailList.add(model);
-                        Log.d("beta","mo "+response);
-
-
+                        list.add(model);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {
@@ -216,6 +206,8 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        stockDetailList.clear();
+                        stockDetailList.addAll(list);
                         favListAdapter.notifyDataSetChanged();
                         if(aSwitch.isChecked()){
                             handler.removeCallbacks(runnable);
@@ -320,13 +312,13 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
 
             Gson gson=new Gson();
             listOfStocks.clear();
-            adapter.notifyDataSetChanged();
+            stockNameListAdapter.notifyDataSetChanged();
             for(int i=0;i<lenghth;i++){
 
                 StockNames stockNames=gson.fromJson(jsonArray.getString(i),StockNames.class);
                 listOfStocks.add(stockNames);
             }
-            adapter.notifyDataSetChanged();
+            stockNameListAdapter.notifyDataSetChanged();
 
 
 

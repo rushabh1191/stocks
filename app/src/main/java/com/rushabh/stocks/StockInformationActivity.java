@@ -80,7 +80,7 @@ public class StockInformationActivity extends AppCompatActivity {
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),fragments);
 
-        // Set up the ViewPager with the sections adapter.
+        // Set up the ViewPager with the sections stockNameListAdapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
