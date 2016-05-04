@@ -247,11 +247,6 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
     }
 
 
-
-
-
-
-
     @OnClick(R.id.btn_clear)
     void reset(){
         etStockEntry.setText("");
@@ -325,6 +320,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
 
             Gson gson=new Gson();
             listOfStocks.clear();
+            adapter.notifyDataSetChanged();
             for(int i=0;i<lenghth;i++){
 
                 StockNames stockNames=gson.fromJson(jsonArray.getString(i),StockNames.class);
