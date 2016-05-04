@@ -70,7 +70,8 @@ public class StockDetailsFragment extends Fragment implements VolleyResponseList
 
 
 
-    StockNames stockNames;
+    public StockNames stockNames;
+    public String lastPrice="";
     public StockDetailsFragment() {
         // Required empty public constructor
     }
@@ -130,6 +131,7 @@ public class StockDetailsFragment extends Fragment implements VolleyResponseList
             JSONObject json=new JSONObject(jsonObject);
             etName.setText(json.getString("Name"));
             etSymbol.setText(json.getString("Symbol"));
+            lastPrice=json.getString("LastPrice");
             etStockPrice.setText(json.getString("LastPrice"));
             etVolume.setText(json.getString("Volume"));
             etChange.setText(Utils.round(json.getDouble("Change"))+ " ( "

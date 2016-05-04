@@ -21,6 +21,7 @@ import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.widget.ShareDialog;
+import com.rushabh.stocks.modelclasses.StockDetailsModel;
 import com.rushabh.stocks.modelclasses.StockNames;
 
 import java.util.ArrayList;
@@ -95,19 +96,17 @@ public class StockInformationActivity extends AppCompatActivity {
     }
 
 
-    void shareOnFacebook(){
+    void shareOnFacebook(String lastPrice){
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                .putString("og:type", "Stock Information")
-//                .putString("og:title", "Current Stock Price Of "+stockNames.name+" "+stockNames.)
-                .putString("og:description", "In the frozen wastes to the north of Winterfell, sinister and supernatural forces are mustering.")
+                .putString("og:type", "books.book")
+                .putString("og:title", "Current Stock Price Of "+stockNames.name+","+lastPrice)
+                .putString("og:description", "Stock Information Of "+stockNames.name)
                 .putString("books:isbn", "0-553-57340-3")
                 .build();
-
         ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
                 .setActionType("books.reads")
                 .putObject("book", object)
                 .build();
-
         ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
                 .setPreviewPropertyName("book")
                 .setAction(action)
@@ -154,6 +153,10 @@ public class StockInformationActivity extends AppCompatActivity {
             }
             showFavUnfav(!isKeyPresent);
 
+        }
+        else if(id==R.id.fb_share){
+
+            shareOnFacebook(((StockDetailsFragment)mSectionsPagerAdapter.getItem(0)).lastPrice);
         }
         //noinspection SimplifiableIfStatement
         /*if (id == R.id.action_settings) {

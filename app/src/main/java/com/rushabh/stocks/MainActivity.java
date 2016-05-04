@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
     StringRequest createRequest(String stockNames,RequestFuture future){
         StringRequest request = null;
 
-        Log.d("beta","stoc"+stockNames);
+
 
         String url="http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=" + stockNames ;
         request = new StringRequest(Request.Method.GET, url, future, future) {
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
     private Runnable searchRunnable = new Runnable() {
         @Override
         public void run() {
-            if (etStockEntry.getText().length() >= 2) {
+            if (etStockEntry.getText().length() >= 3) {
                 searchStock(etStockEntry.getText().toString());
             }
         }
@@ -293,6 +293,19 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
         params.put("input",input);
         new VolleyRequest(params,1,this,VolleyRequest.URL_LOOKUP);
         pb.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("hi",1);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        int i = savedInstanceState.getInt("hi");
+        Log.d("beta","Restored instance "+i);
     }
 
     @Override
@@ -355,6 +368,7 @@ class StockNameListAdapter extends ArrayAdapter<StockNames>{
     public long getItemId(int position) {
         return 0;
     }
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
