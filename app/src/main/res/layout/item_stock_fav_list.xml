@@ -14,6 +14,8 @@
         <TextView
             android:id="@+id/tv_fav_stockname"
             style="@style/TextAppearance.AppCompat.Large"
+            android:maxEms="4"
+            android:ellipsize="middle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -40,6 +42,7 @@
                 android:id="@+id/tv_fav_price"
                 android:layout_width="wrap_content"
                 style="@style/TextAppearance.AppCompat.Medium"
+
                 android:layout_height="wrap_content" />
 
             <TextView
