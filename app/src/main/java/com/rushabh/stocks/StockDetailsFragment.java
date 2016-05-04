@@ -1,6 +1,7 @@
 package com.rushabh.stocks;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -105,12 +106,22 @@ public class StockDetailsFragment extends Fragment implements VolleyResponseList
         View view=inflater.inflate(R.layout.fragment_stock_details, container, false);
         ButterKnife.bind(this,view);
 
-        String url= "http://chart.finance.yahoo.com/t?s="+stockNames.symbol+"&lang=en-US&width=400&height=300";
+        final String url= "http://chart.finance.yahoo.com/t?s="+stockNames.symbol+"&lang=en-US&width=400&height=300";
         Log.d("beta",url);
         Picasso.with(getActivity()).load(url).into(ivStockImage);
 
+        ivStockImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getActivity(),ImageViewActivityShow.class);
+                intent.putExtra(ImageViewActivityShow.IMAGE_ARGS,url);
+                startActivity(intent);
+            }
+        });
         return  view;
     }
+
+
 
     @Override
     public void onDestroyView() {
@@ -138,7 +149,7 @@ public class StockDetailsFragment extends Fragment implements VolleyResponseList
                     +Utils.round(json.getDouble("ChangePercent"))+" % )");//ChangePercent
             etChangeYTD.setText(json.getString("ChangeYTD"));
             etMarketCap.setText(Utils.truncateNumber(json.getDouble("MarketCap")));
-            etTimestamp.setText(json.getString("Timestamp"));
+            etTimestamp.setText(Utils.convertUTCToTime(json.getString("Timestamp")));
             etHigh.setText(json.getString("High"));
             etLow.setText(json.getString("Low"));
             etOpen.setText(json.getString("Open"));

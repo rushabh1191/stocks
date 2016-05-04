@@ -1,5 +1,7 @@
 package com.rushabh.stocks;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -7,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.rushabh.stocks.helpers.Utils;
 import com.rushabh.stocks.modelclasses.StockNames;
 
 import org.json.JSONArray;
@@ -86,6 +90,17 @@ public class StockNewsFragment extends Fragment implements VolleyResponseListene
         adapter=new NewsAdapter(newsModelArrayList,inflater);
 
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String url=adapter.getItem(position).url;
+
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+            }
+        });
         return view;
     }
 
@@ -159,11 +174,10 @@ class NewsAdapter extends BaseAdapter {
 
         NewsModel model = getItem(position);
         holder.tvNewsTitle.setText(Html.fromHtml("<u>"+model.newsTitle+"</u>"));
-
-        Log.d("beta","d"+model.desciption);
         holder.tvNewsDesciprtion.setText(model.desciption);
         holder.tvSource.setText("Publisher : "+model.source);
-        holder.tvDate.setText("Date : "+model.date);
+        Log.d("beta","ASDf");
+        holder.tvDate.setText("Date : "+ Utils.convertTime(model.date));
 
         return convertView;
     }
@@ -193,6 +207,9 @@ class NewsModel {
 
     @SerializedName("Description")
     String desciption;
+
+    @SerializedName("Url")
+    String url;
 
     @SerializedName("Source")
     String source;

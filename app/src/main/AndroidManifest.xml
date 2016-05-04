@@ -18,7 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
+        <activity android:name=".ImageViewActivityShow"
+/>        <activity
             android:name=".StockInformationActivity"
             android:label="@string/title_activity_stock_information"
             android:theme="@style/AppTheme.NoActionBar">

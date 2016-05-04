@@ -278,6 +278,13 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
             }
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        handler.removeCallbacks(runnable);
+    }
+
     private Runnable searchRunnable = new Runnable() {
         @Override
         public void run() {
