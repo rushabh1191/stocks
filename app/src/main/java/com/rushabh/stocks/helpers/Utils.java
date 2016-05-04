@@ -3,6 +3,7 @@ package com.rushabh.stocks.helpers;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -40,21 +41,18 @@ public class Utils {
     }
 
     public static String convertUTCToTime(String utcTime) {
-        String result = null;
-        SimpleDateFormat sdf = new SimpleDateFormat(
-                TIME_FORMAT);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        SimpleDateFormat df = new SimpleDateFormat("dd MMM yyyy hh:mm a");
-        df.setTimeZone(TimeZone.getTimeZone("IST"));
+        SimpleDateFormat ft = new SimpleDateFormat("DD MMMM dd, HH:mm:ss 'UTC-04:00' yyyy", Locale.US);
+        Date t= null;
         try {
-            Date date = sdf.parse(utcTime);
-            result = df.format(date);
-            return result;
+            t = ft.parse(utcTime);
+            ft.applyPattern("dd MMM, yyy, hh:mm:ss");
+            return  ft.format(t);
         } catch (ParseException e) {
             e.printStackTrace();
-            return utcTime;
+            return  utcTime;
         }
+
 
     }
     public static String round(double d){

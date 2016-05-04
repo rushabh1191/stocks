@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
                         favListAdapter.notifyDataSetChanged();
                         if(aSwitch.isChecked()){
                             handler.removeCallbacks(runnable);
-                            handler.postDelayed(runnable,5000);
+                            handler.postDelayed(runnable,10000);
                         }
 
 

@@ -145,9 +145,27 @@ public class StockDetailsFragment extends Fragment implements VolleyResponseList
             lastPrice=json.getString("LastPrice");
             etStockPrice.setText(json.getString("LastPrice"));
             etVolume.setText(json.getString("Volume"));
+            double d=json.getDouble("ChangePercent");
+            if(d<=0){
+                etChange.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.down,0);
+            }
+            else
+            {
+                etChange.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.up,0);
+            }
+
+            d=json.getDouble("ChangePercentYTD");
+            if(d>0){
+                etChangeYTD.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.up,0);
+            }
+            else {
+                etChangeYTD.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.down,0);
+            }
+
             etChange.setText(Utils.round(json.getDouble("Change"))+ " ( "
                     +Utils.round(json.getDouble("ChangePercent"))+" % )");//ChangePercent
-            etChangeYTD.setText(json.getString("ChangeYTD"));
+            etChangeYTD.setText(json.getString("ChangeYTD") +
+                    "("+Utils.round(json.getDouble("ChangePercentYTD"))+")");
             etMarketCap.setText(Utils.truncateNumber(json.getDouble("MarketCap")));
             etTimestamp.setText(Utils.convertUTCToTime(json.getString("Timestamp")));
             etHigh.setText(json.getString("High"));

@@ -10,28 +10,35 @@
         android:padding="5dp"
         tools:context=".StockDetailsFragment">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stock Details"
+            style="@style/Base.TextAppearance.AppCompat.Large"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"/>
+
         <!-- TODO: Update blank fragment layout -->
-        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+        <android.support.design.widget.TextInputLayout
+            style="@style/style_textinput">
 
             <EditText
                 android:id="@+id/et_name"
                 style="@style/style_text_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="NAME" />
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+        <android.support.design.widget.TextInputLayout
+            style="@style/style_textinput">
 
             <EditText
                 android:id="@+id/et_symbol"
                 style="@style/style_text_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="SYMBOL" />
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout style="@style/style_textinput">
+        <android.support.design.widget.TextInputLayout
+            style="@style/style_textinput">
 
             <EditText
                 android:id="@+id/et_last_price"
@@ -44,6 +51,9 @@
             <EditText
                 android:id="@+id/et_change"
                 style="@style/style_text_edit"
+                android:drawableRight="@drawable/up"
+                android:drawablePadding="5dp"
+                android:layout_width="wrap_content"
                 android:hint="CHANGE" />
         </android.support.design.widget.TextInputLayout>
 
@@ -76,6 +86,7 @@
             <EditText
                 android:id="@+id/et_change_ytd"
                 style="@style/style_text_edit"
+                android:layout_width="wrap_content"
                 android:hint="CHANGE YTD" />
         </android.support.design.widget.TextInputLayout>
 
