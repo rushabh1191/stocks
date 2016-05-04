@@ -20,7 +20,7 @@ public class PreferenceHelper {
 
     public PreferenceHelper(Context context){
         try {
-            preference=context.getSharedPreferences("com.adda.app", Context.MODE_PRIVATE);
+            preference=context.getSharedPreferences("com.stock.app", Context.MODE_PRIVATE);
         }
         catch (Exception e)
         {
@@ -60,7 +60,7 @@ public class PreferenceHelper {
 
     public boolean isAutoRefresh()
     {
-        return preference.getBoolean(AUTO_REFRESH,true);
+        return preference.getBoolean(AUTO_REFRESH,false);
     }
 
     public void removeKey(String symbol) {
