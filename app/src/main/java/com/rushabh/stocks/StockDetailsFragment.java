@@ -176,25 +176,6 @@ public class StockDetailsFragment extends Fragment implements VolleyResponseList
         }
 
     }
-
-   /* {
-        "Status":"SUCCESS",
-            "Name":"Apple Inc",
-            "Symbol":"AAPL",
-            "LastPrice":97.75,
-            "Change":-6.59999999999999,
-            "ChangePercent":-6.32486823191183,
-            "Timestamp":"Wed Apr 27 15:28:33 UTC-04:00 2016",
-            "MSDate":42487.6448263889,
-            "MarketCap":541982988250,
-            "Volume":6655097,
-            "ChangeYTD":105.26,
-            "ChangePercentYTD":-7.13471404142125,
-            "High":98.7,
-            "Low":95.69,
-            "Open":96.02
-    }
-*/
     @Override
     public void errorRecieved(VolleyError error, int requestId) {
 
