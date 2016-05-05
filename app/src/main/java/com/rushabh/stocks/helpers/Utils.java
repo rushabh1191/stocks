@@ -1,5 +1,7 @@
 package com.rushabh.stocks.helpers;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,11 +44,14 @@ public class Utils {
 
     public static String convertUTCToTime(String utcTime) {
 
-        SimpleDateFormat ft = new SimpleDateFormat("DD MMMM dd, HH:mm:ss 'UTC-04:00' yyyy", Locale.US);
+
+        String u=utcTime.replace("UTC-04:00 ","");
+        Log.d("beta","Asd "+u);
+        SimpleDateFormat ft = new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US);
         Date t= null;
         try {
-            t = ft.parse(utcTime);
-            ft.applyPattern("dd MMM, yyy, hh:mm:ss");
+            t = ft.parse(u);
+            ft.applyPattern("dd MMM, yyy, hh:mm:ss a");
             return  ft.format(t);
         } catch (ParseException e) {
             e.printStackTrace();
