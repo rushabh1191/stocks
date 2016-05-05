@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -48,7 +51,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class MainActivity extends AppCompatActivity implements VolleyResponseListener {
+
+public class MainActivity extends AppCompatActivity implements VolleyResponseListener, View.OnClickListener {
 
 
     @Bind(R.id.stockName)
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
     Switch aSwitch;
 
     @Bind(R.id.lvFav)
-    ListView lvFavList;
+    RecyclerView lvFavList;
 
     StockNames stockName;
 
@@ -103,8 +107,19 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
             }
         });
 
-        favListAdapter=new FavListAdapter(stockDetailList,this);
+        favListAdapter=new FavListAdapter(stockDetailList,handler,runnable,this,this);
+        lvFavList.setLayoutManager(new LinearLayoutManager(this));
+
         lvFavList.setAdapter(favListAdapter);
+
+        lvFavList.setHasFixedSize(true);
+        lvFavList.setAdapter(favListAdapter);
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(favListAdapter);
+        ItemTouchHelper mItemTouchHelper =  new ItemTouchHelper(callback);
+
+        mItemTouchHelper.attachToRecyclerView(lvFavList);
+
 
         handler=new Handler();
 
@@ -128,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
         });
 
 
-        lvFavList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+/*        lvFavList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 StockDetailsModel detailsModel=favListAdapter.getItem(position);
@@ -138,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
 
             }
         });
+        */
         etStockEntry.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -333,6 +349,20 @@ public class MainActivity extends AppCompatActivity implements VolleyResponseLis
     public void errorRecieved(VolleyError error, int requestId) {
         pb.setVisibility(View.GONE);
     }
+
+    @Override
+    public void onClick(View v) {
+
+        FavView view= (FavView) v.getTag();
+        int position=view.position;
+
+
+
+        StockDetailsModel detailsModel=favListAdapter.getItem(position);
+        stockName=new StockNames(detailsModel);
+        getQuote(stockName);
+
+    }
 }
 
 
@@ -398,26 +428,80 @@ class StockNameListAdapter extends ArrayAdapter<StockNames>{
 }
 
 
-class FavListAdapter extends BaseAdapter{
+class FavView extends RecyclerView.ViewHolder{
+
+    @Bind(R.id.tv_fav_stockname)
+    TextView tvStockName;
+
+    @Bind(R.id.tv_fav_market_cap)
+    TextView tvMarketCap;
+
+    @Bind(R.id.tv_fav_price)
+    TextView tvPrice;
+
+    @Bind(R.id.tv_fav_stocknsymbol)
+    TextView tvSymbol;
+
+    @Bind(R.id.tv_fav_change)
+    TextView tvChange;
+
+    int position;
+
+    public FavView(View itemView) {
+        super(itemView);
+        ButterKnife.bind(this,itemView);
+    }
+}
+class FavListAdapter extends RecyclerView.Adapter<FavView> implements ItemTouchHelperAdapter {
 
     ArrayList<StockDetailsModel> detailsModelArrayList;
 
     LayoutInflater inflater;
     Context context;
-    FavListAdapter(ArrayList<StockDetailsModel> detailsModelArrayList,Context context){
 
-        this.context=context;
-        this.detailsModelArrayList=detailsModelArrayList;
-        inflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-    @Override
-    public int getCount() {
-        return detailsModelArrayList.size();
+    View.OnClickListener listener;
+
+    Handler handler;
+    Runnable runnable;
+
+    FavListAdapter(ArrayList<StockDetailsModel> detailsModelArrayList, Handler handler,Runnable runnable
+            ,Context context, View.OnClickListener listener) {
+
+        this.handler = handler;
+        this.runnable=runnable;
+        this.context = context;
+        this.detailsModelArrayList = detailsModelArrayList;
+        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.listener=listener;
     }
 
-    @Override
     public StockDetailsModel getItem(int position) {
         return detailsModelArrayList.get(position);
+    }
+
+    @Override
+    public FavView onCreateViewHolder(ViewGroup parent, int viewType) {
+        View convertView = inflater.inflate(R.layout.item_stock_fav_list, parent, false);
+        FavView holder = new FavView(convertView);
+
+
+        convertView.setTag(holder);
+        convertView.setOnClickListener(listener);
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(FavView holder, int position) {
+        StockDetailsModel model = getItem(position);
+        holder.tvStockName.setText(model.name);
+        holder.position=position;
+        holder.tvSymbol.setText(model.symbol);
+        holder.tvChange.setText(Utils.round(model.pecent) + " % ");
+        int color = model.pecent < 0 ? android.R.color.holo_red_dark : android.R.color.holo_green_light;
+
+        holder.tvChange.setBackgroundColor(context.getResources().getColor(color));
+        holder.tvMarketCap.setText("Market Cap " + Utils.truncateNumber(model.marketcap));
+        holder.tvPrice.setText("$ " + model.price);
     }
 
     @Override
@@ -426,51 +510,88 @@ class FavListAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        DetailViewHolder holder;
-        if(convertView==null){
-
-            convertView=inflater.inflate(R.layout.item_stock_fav_list,parent,false);
-            holder=new DetailViewHolder(convertView);
-            convertView.setTag(holder);
-        }
-        else{
-            holder= (DetailViewHolder) convertView.getTag();
-        }
-
-        StockDetailsModel model=getItem(position);
-        holder.tvStockName.setText(model.name);
-        holder.tvSymbol.setText(model.symbol);
-        holder.tvChange.setText(Utils.round(model.pecent)+" % ");
-        int color = model.pecent<0 ? android.R.color.holo_red_dark : android.R.color.holo_green_light;
-
-        holder.tvChange.setBackgroundColor(context.getResources().getColor(color));
-        holder.tvMarketCap.setText("Market Cap "+Utils.truncateNumber(model.marketcap));
-        holder.tvPrice.setText( "$ "+model.price);
-        return convertView;
+    public int getItemCount() {
+        return detailsModelArrayList.size();
     }
 
-    class DetailViewHolder{
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
 
-        @Bind(R.id.tv_fav_stockname)
-        TextView tvStockName;
-
-        @Bind(R.id.tv_fav_market_cap)
-        TextView tvMarketCap;
-
-        @Bind(R.id.tv_fav_price)
-        TextView tvPrice;
-
-        @Bind(R.id.tv_fav_stocknsymbol)
-        TextView tvSymbol;
-
-        @Bind(R.id.tv_fav_change)
-        TextView tvChange;
-
-
-        public DetailViewHolder(View view){
-            ButterKnife.bind(this,view);
-        }
     }
+
+    @Override
+    public void onItemDismiss(final int position) {
+
+        final PreferenceHelper preferenceHelper=new PreferenceHelper(context);
+        if(preferenceHelper.isAutoRefresh()){
+            handler.removeCallbacks(runnable);
+        }
+        new ConfirmationWindow(context,"Confirm","Are you sure you want to remove?","OK ","Cancel"){
+            @Override
+            protected void setPositiveResponse() {
+                super.setPositiveResponse();
+                StockDetailsModel model=detailsModelArrayList.remove(position);
+
+                preferenceHelper.removeKey(model.symbol);
+                notifyDataSetChanged();
+
+                if(preferenceHelper.isAutoRefresh()){
+                    handler.postDelayed(runnable,10000);
+                }
+            }
+
+            @Override
+            protected void setNegativeResponse() {
+                super.setNegativeResponse();
+                notifyDataSetChanged();
+            }
+        };
+        Log.d("beta","SD"+position);
+    }
+}
+
+interface ItemTouchHelperAdapter {
+
+    void onItemMove(int fromPosition, int toPosition);
+
+    void onItemDismiss(int position);
+}
+
+class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
+
+    private final ItemTouchHelperAdapter mAdapter;
+
+    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
+        mAdapter = adapter;
+    }
+
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isItemViewSwipeEnabled() {
+        return true;
+    }
+
+    @Override
+    public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+        return makeMovementFlags(dragFlags, swipeFlags);
+    }
+
+    @Override
+    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                          RecyclerView.ViewHolder target) {
+        mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+        return true;
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+    }
+
 }

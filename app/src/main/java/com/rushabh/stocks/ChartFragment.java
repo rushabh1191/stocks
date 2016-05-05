@@ -87,11 +87,14 @@ public class ChartFragment extends Fragment implements VolleyResponseListener {
     }
 
     void loadWebView(String data){
-        webView.addJavascriptInterface(new WebAppInterface(getActivity(),this.data,stockNames.symbol), "Android");
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
+        if(webView!=null){
+            webView.addJavascriptInterface(new WebAppInterface(getActivity(),this.data,stockNames.symbol), "Android");
+            WebSettings webSettings = webView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
 
-        webView.loadUrl("file:///android_asset/index.html");
+            webView.loadUrl("file:///android_asset/index.html");
+        }
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
